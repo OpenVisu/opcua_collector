@@ -1,0 +1,6 @@
+influxdb
+opcua
+cryptography
+lxml
+sentry-sdk
+requests
