@@ -81,6 +81,7 @@ class SubHandler(object):
             return str(round(value.timestamp()))
 
         value = value.__dict__
+        values = {}
         for key in value.keys():
-            value[key] = self._object_to_dict(value[key])
-        return value
+            values[key] = self._object_to_dict(value[key])
+        return values
