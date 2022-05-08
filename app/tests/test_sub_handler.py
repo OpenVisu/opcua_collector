@@ -26,7 +26,7 @@ class TestSubHandler(unittest.TestCase):
         self.backend = Backend('http://test-server', 'test-token')
         self.sub_handler = SubHandler(0, self.backend)
 
-    def test_object_to_dict_mappingproxy(self):
+    def test_object_to_dict(self):
         class A:
             test_a = 1
 
