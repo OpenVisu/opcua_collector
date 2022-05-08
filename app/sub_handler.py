@@ -83,5 +83,7 @@ class SubHandler(object):
         value = value.__dict__
         values = {}
         for key in value.keys():
+            if(key.startswith('__') and key.endswith('__')):
+                continue
             values[key] = self._object_to_dict(value[key])
         return values
