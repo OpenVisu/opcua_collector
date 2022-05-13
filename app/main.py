@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import asyncio
 import os
 import time
 import typing
@@ -41,16 +42,15 @@ if os.getenv('SENTRY_DSN') is not None:
     )
 
 
-def _connect_to_server(server: Server) -> typing.Tuple[asyncua.Client, Subscription]:
+async def _connect_to_server(server: Server, backend: Backend) -> typing.Tuple[asyncua.Client, Subscription]:
     client = asyncua.Client(server.url, timeout=10)
     connected = False
     connection_error = ''
-    subscription = None
+    subscription: Subscription
     try:
-        client.connect()
-        client.load_type_definitions()
-        subscription = client.create_subscription(
-            1000, SubHandler(server.id, backend))
+        await client.connect()
+        await client.load_type_definitions()
+        subscription = await client.create_subscription(1000, SubHandler(server.id, backend))
 
     except UaStatusCodeError as error:  # type: ignore
         connection_error = f"UaStatusCodeError({error.code})"
@@ -65,7 +65,7 @@ def _connect_to_server(server: Server) -> typing.Tuple[asyncua.Client, Subscript
     return client, subscription
 
 
-if __name__ == '__main__':
+async def main():
     backend: Backend = Backend(
         os.getenv('API_URL', 'http://api/'),
         os.environ['ACCESS_TOKEN'],
@@ -73,7 +73,6 @@ if __name__ == '__main__':
     clients: typing.Dict[int, asyncua.Client] = {}
     server_subscriptions: typing.Dict[int, Subscription] = {}
     node_subscriptions: typing.Dict[int, any] = {}
-
     try:
         while True:
             # get all servers
@@ -91,8 +90,8 @@ if __name__ == '__main__':
             for server in server_list:
                 server_ids.append(server.id)
                 if server.id not in clients or server.id not in server_subscriptions:
-                    clients[server.id], server_subscriptions[server.id] = _connect_to_server(
-                        server)
+                    clients[server.id], server_subscriptions[server.id] = await _connect_to_server(
+                        server, backend)
 
             # disconnect from all servers that no longer exist
             server_keys = clients.keys()
@@ -100,7 +99,7 @@ if __name__ == '__main__':
                 if server_id not in server_ids:
                     if server_id in server_subscriptions:  # might not exist if init sequence fails for a server
                         del server_subscriptions[server_id]
-                    clients[server_id].disconnect()
+                    await clients[server_id].disconnect()
                     del clients[server_id]
 
             node_list: typing.List[NodeModel] = backend.node_index_filtered()
@@ -118,17 +117,16 @@ if __name__ == '__main__':
                     try:
                         node_subscriptions[n.id] = {
                             'server_id': n.server_id,
-                            'subscription': server_subscriptions[n.server_id].subscribe_data_change(node)
+                            'subscription': await server_subscriptions[n.server_id].subscribe_data_change(node)
                         }
                     except UaStatusCodeError as error:  # type: ignore
                         print(f"UaStatusCodeError({error.code})")
-
             # unsubscribe nodes that are no long available / tracked
             node_subscriptions_keys = node_subscriptions.keys()
             for n.id in node_subscriptions_keys:
                 if n.id not in node_ids:
                     try:
-                        server_subscriptions[node_subscriptions[n.id]['server_id']] \
+                        await server_subscriptions[node_subscriptions[n.id]['server_id']] \
                             .unsubscribe(node_subscriptions[n.id]['subscription'])
                     except BadMonitoredItemIdInvalid:  # type: ignore
                         pass
@@ -139,7 +137,7 @@ if __name__ == '__main__':
         # try to close all remaining open connections
         for (_id, _) in clients:
             try:
-                clients[_id].disconnect()
+                await clients[_id].disconnect()
             except AttributeError:
                 print('AttributeError while disconnecting')
             except UaStatusCodeError as error:  # type: ignore
@@ -150,3 +148,7 @@ if __name__ == '__main__':
                 print('OSError while disconnecting')
             except UaError:
                 print('UaError while disconnecting')
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
