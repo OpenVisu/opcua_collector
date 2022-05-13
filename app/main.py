@@ -73,6 +73,7 @@ async def main():
     clients: typing.Dict[int, asyncua.Client] = {}
     server_subscriptions: typing.Dict[int, Subscription] = {}
     node_subscriptions: typing.Dict[int, any] = {}
+
     try:
         while True:
             # get all servers
@@ -121,6 +122,7 @@ async def main():
                         }
                     except UaStatusCodeError as error:  # type: ignore
                         print(f"UaStatusCodeError({error.code})")
+
             # unsubscribe nodes that are no long available / tracked
             node_subscriptions_keys = node_subscriptions.keys()
             for n.id in node_subscriptions_keys:
