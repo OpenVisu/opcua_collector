@@ -49,7 +49,7 @@ async def _connect_to_server(server: Server, backend: Backend) -> typing.Tuple[a
     subscription: Subscription
     try:
         await client.connect()
-        await client.load_type_definitions()
+        await client.load_data_type_definitions()
         subscription = await client.create_subscription(1000, SubHandler(server.id, backend))
 
     except UaStatusCodeError as error:  # type: ignore
