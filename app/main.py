@@ -20,12 +20,13 @@ import typing
 from concurrent.futures import CancelledError
 
 import sentry_sdk
-from opcua.ua import UaError
+from asyncua.ua import UaError
 
-import opcua
-from opcua import Node
-from opcua.ua import UaStatusCodeError
-from opcua.ua.uaerrors import BadMonitoredItemIdInvalid
+import asyncua
+from asyncua import Node
+from asyncua.ua import UaStatusCodeError
+from asyncua.ua.uaerrors import BadMonitoredItemIdInvalid
+from asyncua.common.subscription import Subscription
 
 from models.server import Server
 from models.node import Node as NodeModel
@@ -40,8 +41,8 @@ if os.getenv('SENTRY_DSN') is not None:
     )
 
 
-def _connect_to_server(server: Server) -> typing.Tuple[opcua.Client, opcua.Subscription]:
-    client = opcua.Client(server.url, timeout=10)
+def _connect_to_server(server: Server) -> typing.Tuple[asyncua.Client, Subscription]:
+    client = asyncua.Client(server.url, timeout=10)
     connected = False
     connection_error = ''
     subscription = None
@@ -69,8 +70,8 @@ if __name__ == '__main__':
         os.getenv('API_URL', 'http://api/'),
         os.environ['ACCESS_TOKEN'],
     )
-    clients: typing.Dict[int, opcua.Client] = {}
-    server_subscriptions: typing.Dict[int, opcua.Subscription] = {}
+    clients: typing.Dict[int, asyncua.Client] = {}
+    server_subscriptions: typing.Dict[int, asyncua.Subscription] = {}
     node_subscriptions: typing.Dict[int, any] = {}
 
     try:

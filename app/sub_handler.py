@@ -17,9 +17,9 @@ import datetime
 import json
 import time
 
-from opcua import Node
-from opcua.common.subscription import DataChangeNotif
-from opcua.ua import MonitoredItemNotification
+from asyncua import Node
+from asyncua.common.subscription import DataChangeNotif
+from asyncua.ua import MonitoredItemNotification
 import sentry_sdk
 
 from backend import Backend
