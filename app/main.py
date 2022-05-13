@@ -71,7 +71,7 @@ if __name__ == '__main__':
         os.environ['ACCESS_TOKEN'],
     )
     clients: typing.Dict[int, asyncua.Client] = {}
-    server_subscriptions: typing.Dict[int, asyncua.Subscription] = {}
+    server_subscriptions: typing.Dict[int, Subscription] = {}
     node_subscriptions: typing.Dict[int, any] = {}
 
     try:
