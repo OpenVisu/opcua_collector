@@ -133,7 +133,7 @@ async def main():
                     except BadMonitoredItemIdInvalid:  # type: ignore
                         pass
                     del node_subscriptions[n.id]
-            time.sleep(60)
+            await asyncio.sleep(60)
 
     finally:
         # try to close all remaining open connections
