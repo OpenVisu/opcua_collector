@@ -37,7 +37,6 @@ class TestSubHandler(unittest.TestCase):
         self.assertEqual({'test_b': 2}, actual)
 
         actual = self.sub_handler._object_to_dict(A)
-        print(actual)
         self.assertEqual({'test_a': 1}, actual)
 
     def test_object_to_dict_string(self):
