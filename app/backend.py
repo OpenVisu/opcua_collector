@@ -69,7 +69,7 @@ class Backend:
 
     def node_value_writing_error(self, id: int, error: str):
         data = {
-            'update_at': time.time(),
+            'update_at': round(time.time()),
             'update_error': error,
         }
         self.node_update(id, data)
