@@ -65,6 +65,18 @@ async def _connect_to_server(server: Server, backend: Backend) -> typing.Tuple[a
     return client, subscription
 
 
+# write new data to opcua server
+async def run_update(backend: Backend, clients: typing.Dict[int, asyncua.Client]):
+    node_list: typing.List[NodeModel] = backend.node_index_requiring_update()
+    print(node_list)
+    for node in node_list:
+        try:
+            await clients[node.server_id].get_node(node.identifier).write_value(node.update_value)
+            backend.node_value_writen(node.id)
+        except Exception as exception:
+            backend.node_value_writing_error(node.id, str(exception))
+
+
 async def main():
     backend: Backend = Backend(
         os.getenv('API_URL', 'http://api/'),
@@ -133,13 +145,16 @@ async def main():
                     except BadMonitoredItemIdInvalid:  # type: ignore
                         pass
                     del node_subscriptions[n.id]
-            await asyncio.sleep(60)
+
+            for _ in range(round(60 / 5)):
+                await run_update(backend, clients)
+                await asyncio.sleep(5)
 
     finally:
         # try to close all remaining open connections
-        for (_id, _) in clients:
+        for server in clients.values():
             try:
-                await clients[_id].disconnect()
+                await server.disconnect()
             except AttributeError:
                 print('AttributeError while disconnecting')
             except UaStatusCodeError as error:  # type: ignore
