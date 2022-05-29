@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import json
 import time
 
 from asyncua import Node
@@ -48,13 +47,6 @@ class SubHandler(object):
             return
 
         value = self._object_to_dict(value)
-        try:
-            value = json.dumps(value)
-        except TypeError as error:
-            print('could not convert to json')
-            print(error)
-            print(value)
-            return
 
         st = monitored_item_notification.Value.ServerTimestamp
         response = self.backend.influx_store(

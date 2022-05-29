@@ -40,6 +40,26 @@ class TestSubHandler(unittest.TestCase):
         print(actual)
         self.assertEqual({'test_a': 1}, actual)
 
+    def test_object_to_dict_string(self):
+        test_sting: str = "hi"
+        actual = self.sub_handler._object_to_dict(test_sting)
+        self.assertEqual(test_sting, actual)
+
+    def test_object_to_dict_int(self):
+        test_int: int = 123
+        actual = self.sub_handler._object_to_dict(test_int)
+        self.assertEqual(test_int, actual)
+
+    def test_object_to_dict_float(self):
+        test_float: float = 123.45
+        actual = self.sub_handler._object_to_dict(test_float)
+        self.assertEqual(test_float, actual)
+
+    def test_object_to_dict_bool(self):
+        test_bool: bool = False
+        actual = self.sub_handler._object_to_dict(test_bool)
+        self.assertEqual(test_bool, actual)
+
 
 if __name__ == '__main__':
     unittest.main()
