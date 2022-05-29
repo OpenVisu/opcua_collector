@@ -68,7 +68,6 @@ async def _connect_to_server(server: Server, backend: Backend) -> typing.Tuple[a
 # write new data to opcua server
 async def run_update(backend: Backend, clients: typing.Dict[int, asyncua.Client]):
     node_list: typing.List[NodeModel] = backend.node_index_requiring_update()
-    print(node_list)
     for node in node_list:
         try:
             await clients[node.server_id].get_node(node.identifier).write_value(node.update_value)
