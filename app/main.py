@@ -70,7 +70,7 @@ async def run_update(backend: Backend, clients: typing.Dict[int, asyncua.Client]
     node_list: typing.List[NodeModel] = backend.node_index_requiring_update()
     for node in node_list:
         try:
-            await clients[node.server_id].get_node(node.identifier).write_value(node.update_value)
+            await clients[node.server_id].get_node(node.identifier).write_value(node.change_value)
             backend.node_value_writen(node.id)
         except Exception as exception:
             backend.node_value_writing_error(node.id, str(exception))

@@ -49,28 +49,28 @@ class Backend:
         return [Node(d) for d in response.json()]
 
     def node_index_requiring_update(self) -> List[Node]:
-        # &filter[update_error][in][]=NULL
+        # &filter[change_error][in][]=NULL
         # is used instead of
-        # &filter[update_error][eq]=NULL
+        # &filter[change_error][eq]=NULL
         # because eq maps to = and not IS and thus is not working
         response = requests.get(
-            f'{self.API_URL}/api/server_manager/node/index?filter[tracked]=1&filter[virtual]=0&filter[update_value][neq]="NULL"&filter[update_error][in][]=NULL&pageSize=-1',
+            f'{self.API_URL}/api/server_manager/node/index?filter[tracked]=1&filter[virtual]=0&filter[change_value][neq]="NULL"&filter[change_error][in][]=NULL&pageSize=-1',
             headers=self._get_headers(),
         )
         return [Node(d) for d in response.json()]
 
     def node_value_writen(self, id: int):
         data = {
-            'update_value': None,
-            'update_at': None,
-            'update_error': None,
+            'change_value': None,
+            'change_error_at': None,
+            'change_error': None,
         }
         self.node_update(id, data)
 
     def node_value_writing_error(self, id: int, error: str):
         data = {
-            'update_at': round(time.time()),
-            'update_error': error,
+            'change_error_at': round(time.time()),
+            'change_error': error,
         }
         self.node_update(id, data)
 
