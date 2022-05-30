@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import time
 from typing import List
 import json
@@ -119,3 +120,24 @@ class Backend:
 
     def _get_headers(self):
         return {"Authorization": f"Bearer {self.ACCESS_TOKEN}"}
+
+    def object_to_dict(self, value):
+        """
+        helper method to convert the value to json
+        """
+        if value is None:
+            return value
+        if type(value) in [str, int, float, list, dict, set, tuple]:
+            return value
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, datetime.datetime):
+            return str(round(value.timestamp()))
+
+        value = value.__dict__
+        values = {}
+        for key in value.keys():
+            if(key.startswith('__') and key.endswith('__')):
+                continue
+            values[key] = self.object_to_dict(value[key])
+        return values

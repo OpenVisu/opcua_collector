@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import time
 
 from asyncua import Node
@@ -43,10 +42,7 @@ class SubHandler(object):
         """
         monitored_item_notification: MonitoredItemNotification = data.monitored_item
 
-        if value is None:
-            return
-
-        value = self._object_to_dict(value)
+        value = self.backend.object_to_dict(value)
 
         st = monitored_item_notification.Value.ServerTimestamp
         response = self.backend.influx_store(
@@ -59,23 +55,3 @@ class SubHandler(object):
             print('could not store data:')
             print(data)
             print(response.text)
-
-    def _object_to_dict(self, value):
-        """
-        helper method to convert the value to json
-        """
-
-        if type(value) in [str, int, float, list, dict, set, tuple]:
-            return value
-        if isinstance(value, bool):
-            return int(value)
-        if isinstance(value, datetime.datetime):
-            return str(round(value.timestamp()))
-
-        value = value.__dict__
-        values = {}
-        for key in value.keys():
-            if(key.startswith('__') and key.endswith('__')):
-                continue
-            values[key] = self._object_to_dict(value[key])
-        return values
