@@ -32,3 +32,6 @@ class Node:
         self.writable: bool = data['writable']
         self.virtual: bool = data['virtual']
         self.parent_identifier: int = data['parent_identifier']
+        self.change_value: int = data['change_value']
+        self.change_error_at: int = data['change_error_at']
+        self.change_error: int = data['change_error']
