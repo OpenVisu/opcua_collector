@@ -90,7 +90,7 @@ class Backend:
             "server_id": server_id,
             "node_id": node_identifier,
             "time": timestamp,
-            "value": json.dumps(data),
+            "value": json.dumps(value),
         }
         response = requests.post(
             f'{self.API_URL}/api/server_manager/influx/store',
