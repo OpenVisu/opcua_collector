@@ -17,7 +17,7 @@ import time
 
 from asyncua import Node
 from asyncua.common.subscription import DataChangeNotif
-from asyncua.ua import MonitoredItemNotification
+from asyncua.ua import MonitoredItemNotification, EventNotificationList, StatusChangeNotification
 import sentry_sdk
 
 from backend import Backend
@@ -54,4 +54,21 @@ class SubHandler(object):
         if response.status_code != 200:
             print('could not store data:')
             print(data)
+            print('could not store value:')
+            print(value)
+            print('server response:')
             print(response.text)
+
+    def event_notification(self, event: EventNotificationList):
+        """
+        called for every event notification from server
+        """
+        print('event_notification:')
+        print(event)
+
+    def status_change_notification(self, status: StatusChangeNotification):
+        """
+        called for every status change notification from server
+        """
+        print('status_change_notification:')
+        print(status)
